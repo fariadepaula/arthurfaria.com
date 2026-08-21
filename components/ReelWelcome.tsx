@@ -12,7 +12,7 @@ const STATS = [
 
 const SOCIAL_LINKS = [
   { label: "LinkedIn", icon: "/Linkedin.svg", href: "https://linkedin.com/in/arfaria" },
-  { label: "GitHub", icon: "/Github.svg", href: "https://github.com/afaaafa" },
+  { label: "GitHub", icon: "/Github.svg", href: "https://github.com/fariadepaula" },
   { label: "Substack", icon: "/Substack.svg", href: "https://afaaafa.substack.com/" },
 ];
 
