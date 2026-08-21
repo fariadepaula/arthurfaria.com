@@ -41,7 +41,7 @@ export default function Home() {
       content: (
         <ReelExperience
           reelId="experience-fit"
-          role="Software Engineer"
+          role="Product Engineer"
           company="FIT Energia (Santander Group)"
           period="Mar 2025 – Present"
           type="Full time · Fullstack"
@@ -50,10 +50,12 @@ export default function Home() {
             { label: "Ruby on Rails", className: "border-red-500/60 text-red-400 bg-red-500/5" },
           ]}
           highlights={[
-            "Promoted 3x in a single year",
+            "Promoted 2x in a single year",
             "Patched a critical IDOR vulnerability, preventing unauthorized modification of user financial data",
             "Increased user acquisition by 30% via a backend reward-referral system",
             "Reduced RAM usage by 70% using rate-limiting and concurrency in background jobs",
+            "Built a Hotwire and Stimulus interface for visually mapping invoice fields, enabling OCR-based extraction of structured billing data",
+            "Refactored legacy code into Ruby POROs, improving testability and long-term maintainability",
             "Led technical talks on OOD, Sidekiq Enterprise, and Clean Code",
           ]}
           video={<ReelVideo src={fitVideo} />}
@@ -99,7 +101,7 @@ export default function Home() {
             { label: "Node.js", className: "border-green-500/60 text-green-400 bg-green-500/5" },
           ]}
           highlights={[
-            "Built an AI-driven analytics engine using OpenAI APIs, turning raw newsletter metrics into actionable insights",
+            "Built an analytics engine that transformed raw newsletter metrics into actionable insights, reducing manual reporting time for creators",
             "Developed a lead-generation page with gated content delivery to drive newsletter subscription growth",
           ]}
           video={<ReelVideo src={pingbackVideo} />}
