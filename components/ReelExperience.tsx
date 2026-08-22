@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useReelActive } from "./ReelActiveContext";
+import { useEffect } from "react";
+import { useReelComments } from "./ReelCommentsContext";
 
 export interface ReelExperienceProps {
   role: string;
@@ -45,32 +45,44 @@ function StackHashtags({ stack, className = "" }: { stack: string[]; className?:
 }
 
 export function ReelExperience({ role, company, period, highlights, stack, video }: ReelExperienceProps) {
-  const [open, setOpen] = useState(false);
-  const isActive = useReelActive();
+  const { openComments, setDescription } = useReelComments();
   const highlight = highlights[0];
 
-  // Close the description sheet once this reel is scrolled away from, so it
-  // can't float over whatever reel becomes active next (mirrors Reel.tsx's
-  // own handling of the comment sheet).
-  const [wasActive, setWasActive] = useState(isActive);
-  if (isActive !== wasActive) {
-    setWasActive(isActive);
-    if (!isActive) setOpen(false);
-  }
+  // Register this reel's full description with the shared comments sheet —
+  // on real Instagram the caption and comments live in the same sheet, tap
+  // the caption to jump straight into it.
+  useEffect(() => {
+    setDescription(
+      <div>
+        <p className="text-xs font-bold uppercase tracking-widest text-white/40">Experience</p>
+        <h2 className="mt-2 text-lg font-black tracking-tight">{company}</h2>
+        <p className="mt-1 text-sm font-semibold text-white/70">{role} · {period}</p>
+        <ul className="mt-5 flex flex-col gap-4">
+          {highlights.map((h) => (
+            <li key={h} className="flex gap-3 text-sm leading-relaxed text-white/90">
+              <span className="mt-0.5 shrink-0 text-white/40">→</span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+        <StackHashtags stack={stack} className="mt-5" />
+      </div>
+    );
+  }, [company, role, period, highlights, stack, setDescription]);
 
   return (
     <div className="relative h-full text-white">
       {video && <div className="absolute inset-0">{video}</div>}
 
-      {/* Caption overlay — collapsed view, tap to open the full description sheet */}
+      {/* Caption overlay — tap to open the full description in the comments sheet */}
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setOpen(true)}
+        onClick={openComments}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            setOpen(true);
+            openComments();
           }
         }}
         className="absolute inset-x-0 bottom-0 cursor-pointer pt-24 pb-8 pl-4 pr-20 text-left bg-linear-to-t from-black/90 via-black/50 to-transparent"
@@ -82,35 +94,6 @@ export function ReelExperience({ role, company, period, highlights, stack, video
           {highlight} <span className="text-white/50">… more</span>
         </p>
         <StackHashtags stack={stack} className="mt-3" />
-      </div>
-
-      {/* Full description — Instagram-style bottom sheet */}
-      <div
-        className={`fixed inset-0 z-30 flex flex-col justify-end transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      >
-        <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="relative flex flex-col bg-[#18181b] rounded-t-3xl max-h-[75%]"
-        >
-          <div className="flex justify-center pt-4 pb-2">
-            <div className="w-9 h-1 rounded-full bg-white/20" />
-          </div>
-          <div className="overflow-y-auto overscroll-contain px-6 pt-2 pb-8" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/40">Experience</p>
-            <h2 className="mt-2 text-lg font-black tracking-tight">{company}</h2>
-            <p className="mt-1 text-sm font-semibold text-white/70">{role} · {period}</p>
-            <ul className="mt-5 flex flex-col gap-4">
-              {highlights.map((h) => (
-                <li key={h} className="flex gap-3 text-sm leading-relaxed text-white/90">
-                  <span className="mt-0.5 shrink-0 text-white/40">→</span>
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ul>
-            <StackHashtags stack={stack} className="mt-5" />
-          </div>
-        </div>
       </div>
     </div>
   );

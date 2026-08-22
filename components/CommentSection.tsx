@@ -25,20 +25,56 @@ function timeAgo(iso: string): string {
 // a fixed-height panel to the right of the reel on desktop (Instagram web).
 // ---------------------------------------------------------------------------
 
+const DISMISS_THRESHOLD = 100;
+
 interface CommentSectionProps {
   reelId: string;
   open: boolean;
   onClose: () => void;
   onPosted?: () => void;
+  description?: React.ReactNode;
 }
 
-export function CommentSection({ reelId, open, onClose, onPosted }: CommentSectionProps) {
+export function CommentSection({ reelId, open, onClose, onPosted, description }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [username, setUsername] = useState("");
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const dragStartRef = useRef<number | null>(null);
+  const dragYRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  // Drag-to-dismiss is driven entirely through refs/direct style writes so a
+  // fast flick isn't at the mercy of React's render timing, and dragging
+  // doesn't re-render the whole comment list on every pointermove.
+  function handleDragStart(e: React.PointerEvent) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragStartRef.current = e.clientY;
+    dragYRef.current = 0;
+    if (panelRef.current) panelRef.current.style.transition = "none";
+  }
+
+  function handleDragMove(e: React.PointerEvent) {
+    if (dragStartRef.current === null) return;
+    const y = Math.max(0, e.clientY - dragStartRef.current);
+    dragYRef.current = y;
+    if (panelRef.current) panelRef.current.style.transform = `translateY(${y}px)`;
+    if (backdropRef.current) backdropRef.current.style.opacity = String(Math.max(0, 1 - y / 400));
+  }
+
+  function handleDragEnd() {
+    if (dragStartRef.current === null) return;
+    dragStartRef.current = null;
+    const shouldClose = dragYRef.current > DISMISS_THRESHOLD;
+    if (panelRef.current) {
+      panelRef.current.style.transition = "";
+      panelRef.current.style.transform = "";
+    }
+    if (backdropRef.current) backdropRef.current.style.opacity = "";
+    if (shouldClose) onClose();
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -61,11 +97,11 @@ export function CommentSection({ reelId, open, onClose, onPosted }: CommentSecti
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [open, onClose, reelId]);
 
+  // Scroll back to the top on open, so the description (when present) is
+  // what the user sees first instead of jumping straight to the comments.
   useEffect(() => {
-    if (open && listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
-    }
-  }, [comments, open]);
+    if (open && listRef.current) listRef.current.scrollTop = 0;
+  }, [open]);
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -81,6 +117,11 @@ export function CommentSection({ reelId, open, onClose, onPosted }: CommentSecti
       setComments((prev) => [...prev, comment]);
       setContent("");
       onPosted?.();
+      // Only the newly-posted comment should pull the view down — the
+      // scroll-to-top-on-open effect above owns the initial position.
+      requestAnimationFrame(() => {
+        if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+      });
     }
     setSubmitting(false);
   }
@@ -90,15 +131,25 @@ export function CommentSection({ reelId, open, onClose, onPosted }: CommentSecti
       className={`fixed inset-0 z-20 flex flex-col justify-end md:relative md:inset-auto md:my-4 md:ml-4 md:h-[calc(100%-2rem)] md:justify-stretch transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
       {/* backdrop — mobile sheet only, desktop panel sits inline */}
-      <div className="absolute inset-0 bg-black/50 md:hidden" onClick={onClose} />
+      <div
+        ref={backdropRef}
+        className="absolute inset-0 bg-black/50 md:hidden"
+        onClick={onClose}
+      />
 
       {/* panel */}
       <div
         ref={panelRef}
-        className={`relative flex flex-col bg-[#18181b] rounded-t-3xl max-h-[75%] md:h-full md:w-90 md:max-h-none md:rounded-2xl md:border md:border-[#222427] ${!open ? "md:hidden" : ""}`}
+        className={`relative flex flex-col bg-[#18181b] rounded-t-3xl max-h-[75%] md:h-full md:w-90 md:max-h-none md:rounded-2xl md:border md:border-[#222427] transition-transform duration-200 ${!open ? "md:hidden" : ""}`}
       >
         {/* drag handle — mobile sheet only */}
-        <div className="flex justify-center pt-3 pb-1 md:hidden">
+        <div
+          onPointerDown={handleDragStart}
+          onPointerMove={handleDragMove}
+          onPointerUp={handleDragEnd}
+          onPointerCancel={handleDragEnd}
+          className="flex justify-center pt-3 pb-1 md:hidden touch-none cursor-grab active:cursor-grabbing"
+        >
           <div className="w-9 h-1 rounded-full bg-white/20" />
         </div>
 
@@ -120,6 +171,9 @@ export function CommentSection({ reelId, open, onClose, onPosted }: CommentSecti
           onTouchMove={(e) => e.stopPropagation()}
           className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 flex flex-col gap-6 min-h-0"
         >
+          {description && (
+            <div className="pb-6 border-b border-white/10">{description}</div>
+          )}
           {comments.length === 0 && (
             <p className="text-white/30 text-xs text-center mt-4">No comments yet. Be the first!</p>
           )}
