@@ -8,6 +8,12 @@ import { ReelVideo } from "@/components/ReelVideo";
 import { ReelContact } from "@/components/ReelContact";
 import { ReelProjects } from "@/components/ReelProjects";
 
+// Cuts fetched byte size (auto format/quality, capped width) without a visible
+// quality hit on these small looping card/background videos.
+function optimizeVideo(url: string): string {
+  return url.replace("/video/upload/", "/video/upload/f_auto,q_auto,w_720/");
+}
+
 const BRAINROT_VIDEOS_ORIGINAL = [
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802432/gta-01_gikuw8.mp4",
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802423/satisfying-02_iepfgq.mp4",
@@ -17,7 +23,7 @@ const BRAINROT_VIDEOS_ORIGINAL = [
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802420/satisfying-03_vbyxhz.mp4",
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802418/satisfying-01_xef1lp.mp4",
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802417/cat_mzsna5.mp4",
-];
+].map(optimizeVideo);
 
 function randomBrainrotVideos(count: number): string[] {
   const shuffled = [...BRAINROT_VIDEOS_ORIGINAL].sort(() => Math.random() - 0.5);
@@ -31,7 +37,7 @@ export default function Home() {
     {
       id: "welcome",
       label: "Welcome",
-      content: <ReelWelcome video={<ReelVideo src="https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4" />} />,
+      content: <ReelWelcome video={<ReelVideo src={optimizeVideo("https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4")} />} />,
     },
     {
       id: "experience-fit",
@@ -41,11 +47,6 @@ export default function Home() {
           role="Product Engineer"
           company="FIT Energia (Santander Group)"
           period="Mar 2025 – Present"
-          type="Full time · Fullstack"
-          location="Belo Horizonte, Brazil"
-          tags={[
-            { label: "Ruby on Rails", className: "border-red-500/60 text-red-400 bg-red-500/5" },
-          ]}
           highlights={[
             "Promoted 2x in a single year",
             "Patched a critical IDOR vulnerability, preventing unauthorized modification of user financial data",
@@ -55,7 +56,8 @@ export default function Home() {
             "Refactored legacy code into Ruby POROs, improving testability and long-term maintainability",
             "Led technical talks on OOD, Sidekiq Enterprise, and Clean Code",
           ]}
-          video={<ReelVideo src={fitVideo} />}
+          stack={["Ruby on Rails", "Hotwire", "Erb", "Sidekiq"]}
+          video={<ReelVideo src={fitVideo} eagerPreload showMuteButton={false} />}
         />
       ),
     },
@@ -67,18 +69,13 @@ export default function Home() {
           role="Fullstack Software Engineer"
           company="Freelancing"
           period="Jul 2024 – Mar 2025"
-          type="Contract"
-          location="Remote"
-          tags={[
-            { label: "React", className: "border-cyan-400/50 text-cyan-300 bg-cyan-500/5" },
-            { label: "Next.js", className: "border-white/40 text-white/80 bg-white/5" }
-          ]}
           highlights={[
+            "Increased CTR by 60% on a solar energy landing page",
             "Built a real estate management platform with Next.js for centralized cataloging and automated price updates",
             "Implemented automated property sync via third-party APIs, reducing manual overhead",
-            "Increased CTR by 60% on a solar energy landing page",
           ]}
-          video={<ReelVideo src={freelanceVideo} />}
+          stack={["MongoDB", "Next.js", "JavaScript", "TypeScript"]}
+          video={<ReelVideo src={freelanceVideo} eagerPreload showMuteButton={false} />}
         />
       ),
     },
@@ -90,16 +87,12 @@ export default function Home() {
           role="Software Engineer"
           company="Pingback"
           period="Oct 2023 – Jul 2024"
-          type="Full time · Backend"
-          location="Belo Horizonte, Brazil"
-          tags={[
-            { label: "Node.js", className: "border-green-500/60 text-green-400 bg-green-500/5" },
-          ]}
           highlights={[
             "Built an analytics engine that transformed raw newsletter metrics into actionable insights, reducing manual reporting time for creators",
             "Developed a lead-generation page with gated content delivery to drive newsletter subscription growth",
           ]}
-          video={<ReelVideo src={pingbackVideo} />}
+          stack={["Node.js", "AWS"]}
+          video={<ReelVideo src={pingbackVideo} eagerPreload showMuteButton={false} />}
         />
       ),
     },
@@ -189,7 +182,7 @@ export default function Home() {
       label: "Education",
       description: "B.Sc. Software Engineering, The Pontifical Catholic University of Minas Gerais",
       content: (
-        <ReelVideo src="https://res.cloudinary.com/dad5eakr9/video/upload/v1772802436/PUC-Minas_gp9brr.mp4" />
+        <ReelVideo src={optimizeVideo("https://res.cloudinary.com/dad5eakr9/video/upload/v1772802436/PUC-Minas_gp9brr.mp4")} />
       ),
     },
     {

@@ -4,6 +4,10 @@ import { forwardRef, useState, useEffect, useRef } from "react";
 import { LikeButton } from "./LikeButton";
 import { CommentButton, CommentSection } from "./CommentSection";
 import { ReelActiveContext } from "./ReelActiveContext";
+import { useLike } from "./useLike";
+
+const DOUBLE_TAP_MS = 300;
+const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"]';
 
 interface ReelProps {
   children: React.ReactNode;
@@ -20,6 +24,28 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
   const [commentOpen, setCommentOpen] = useState(false);
   const [commentCount, setCommentCount] = useState<number | null>(null);
   const fetchedCount = useRef(false);
+  const { liked, count: likeCount, toggle: toggleLike, like } = useLike(reelId);
+  const lastTapRef = useRef(0);
+  const heartBurstTokenRef = useRef(0);
+  const [heartBurst, setHeartBurst] = useState(false);
+
+  function handleContentClick(e: React.MouseEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (target.closest(INTERACTIVE_SELECTOR)) return;
+
+    const now = Date.now();
+    if (now - lastTapRef.current < DOUBLE_TAP_MS) {
+      lastTapRef.current = 0;
+      like();
+      setHeartBurst(true);
+      const token = ++heartBurstTokenRef.current;
+      setTimeout(() => {
+        if (heartBurstTokenRef.current === token) setHeartBurst(false);
+      }, 800);
+    } else {
+      lastTapRef.current = now;
+    }
+  }
 
   // Close the comment sheet once this reel is scrolled away from, so it can't
   // float over whatever reel becomes active next. Adjusting state directly
@@ -43,14 +69,23 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
     <ReelActiveContext.Provider value={{ isActive, shouldPreload }}>
       <div ref={ref} className="h-dvh flex justify-center snap-start">
         <div className="relative w-full md:w-auto md:aspect-[9/16] md:my-4 h-full md:h-[calc(100%-2rem)] overflow-hidden md:border border-[#222427] md:rounded-2xl bg-black shadow-[0_4px_50px_20px_rgba(0,0,80,0.1)]">
-          <div className="h-full w-full">{children}</div>
+          <div className="h-full w-full" onClick={handleContentClick}>
+            {children}
+          </div>
+          {heartBurst && (
+            <img
+              src="/Unlike.svg"
+              alt=""
+              className="pointer-events-none absolute top-1/2 left-1/2 h-24 w-24 animate-[heart-burst_0.8s_ease-out_forwards] drop-shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+            />
+          )}
           {description && (
             <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-linear-to-t from-black/80 to-transparent">
               <p className="text-white text-sm leading-snug">{description}</p>
             </div>
           )}
           <div className="md:hidden absolute right-3 bottom-[15%] flex flex-col items-center gap-4 z-20">
-            <LikeButton reelId={reelId} />
+            <LikeButton liked={liked} count={likeCount} onToggle={toggleLike} />
             <CommentButton
               reelId={reelId}
               count={commentCount}
@@ -59,7 +94,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
           </div>
         </div>
         <div className="hidden md:flex flex-col items-center justify-end pb-[20%] pl-4 gap-4">
-          <LikeButton reelId={reelId} />
+          <LikeButton liked={liked} count={likeCount} onToggle={toggleLike} />
           <CommentButton
             reelId={reelId}
             count={commentCount}

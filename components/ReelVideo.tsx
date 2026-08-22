@@ -7,9 +7,11 @@ import { useReelsOptional } from "./ReelsContext";
 interface ReelVideoProps {
   src: string;
   className?: string;
+  eagerPreload?: boolean;
+  showMuteButton?: boolean;
 }
 
-export function ReelVideo({ src, className = "" }: ReelVideoProps) {
+export function ReelVideo({ src, className = "", eagerPreload = false, showMuteButton = true }: ReelVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isActive = useReelActive();
   const shouldPreload = useReelShouldPreload();
@@ -46,21 +48,23 @@ export function ReelVideo({ src, className = "" }: ReelVideoProps) {
         loop
         muted
         playsInline
-        preload={shouldPreload ? "auto" : "none"}
+        preload={eagerPreload || shouldPreload ? "auto" : "none"}
       />
-      <button
-        onClick={toggleMute}
-        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-black/50 p-2 text-white z-10"
-        aria-label={muted ? "Unmute" : "Mute"}
-      >
-        <img
-          src={muted ? "/audio-muted.svg" : "/audio-playing.svg"}
-          alt={muted ? "Audio is muted" : "Audio is playing"}
-          width={20}
-          height={20}
-          className="invert"
-        />
-      </button>
+      {showMuteButton && (
+        <button
+          onClick={toggleMute}
+          className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-black/50 p-2 text-white z-10"
+          aria-label={muted ? "Unmute" : "Mute"}
+        >
+          <img
+            src={muted ? "/audio-muted.svg" : "/audio-playing.svg"}
+            alt={muted ? "Audio is muted" : "Audio is playing"}
+            width={20}
+            height={20}
+            className="invert"
+          />
+        </button>
+      )}
     </div>
   );
 }
