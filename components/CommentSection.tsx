@@ -21,21 +21,24 @@ function timeAgo(iso: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// CommentSection — renders as a full overlay inside the reel
+// CommentSection — a bottom sheet over the reel on mobile (Instagram app),
+// a fixed-height panel to the right of the reel on desktop (Instagram web).
 // ---------------------------------------------------------------------------
 
 interface CommentSectionProps {
   reelId: string;
   open: boolean;
   onClose: () => void;
+  onPosted?: () => void;
 }
 
-export function CommentSection({ reelId, open, onClose }: CommentSectionProps) {
+export function CommentSection({ reelId, open, onClose, onPosted }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [username, setUsername] = useState("");
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -43,6 +46,20 @@ export function CommentSection({ reelId, open, onClose }: CommentSectionProps) {
       .then((r) => r.json())
       .then((d) => setComments(d.comments ?? []));
   }, [open, reelId]);
+
+  // Close on any click outside the panel — the desktop side-panel variant has
+  // no dimmed backdrop to catch that, unlike the mobile sheet's own backdrop.
+  useEffect(() => {
+    if (!open) return;
+    function handlePointerDown(e: PointerEvent) {
+      const target = e.target as HTMLElement;
+      if (panelRef.current?.contains(target)) return;
+      if (target.closest(`[data-comment-toggle="${reelId}"]`)) return; // this reel's own toggle button
+      onClose();
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open, onClose, reelId]);
 
   useEffect(() => {
     if (open && listRef.current) {
@@ -63,64 +80,85 @@ export function CommentSection({ reelId, open, onClose }: CommentSectionProps) {
       const { comment } = await res.json();
       setComments((prev) => [...prev, comment]);
       setContent("");
+      onPosted?.();
     }
     setSubmitting(false);
   }
 
   return (
     <div
-      className={`absolute inset-0 z-20 flex flex-col justify-end transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-20 flex flex-col justify-end md:relative md:inset-auto md:my-4 md:ml-4 md:h-[calc(100%-2rem)] md:justify-stretch transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
-      {/* backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      {/* backdrop — mobile sheet only, desktop panel sits inline */}
+      <div className="absolute inset-0 bg-black/50 md:hidden" onClick={onClose} />
 
       {/* panel */}
-      <div className="relative flex flex-col bg-[#111] rounded-t-2xl max-h-[75%]">
-        {/* drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+      <div
+        ref={panelRef}
+        className={`relative flex flex-col bg-[#18181b] rounded-t-3xl max-h-[75%] md:h-full md:w-90 md:max-h-none md:rounded-2xl md:border md:border-[#222427] ${!open ? "md:hidden" : ""}`}
+      >
+        {/* drag handle — mobile sheet only */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden">
+          <div className="w-9 h-1 rounded-full bg-white/20" />
         </div>
 
-        <div className="flex items-center justify-between px-4 py-2 border-b border-[#222427]">
-          <span className="text-white text-sm font-semibold">Comments</span>
-          <button onClick={onClose} className="text-white/40 hover:text-white text-xl leading-none">×</button>
+        <div className="relative flex items-center justify-center px-5 py-4 border-b border-white/10">
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute left-5 text-white/70 hover:text-white"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+          <span className="text-white text-base font-bold">Comments</span>
         </div>
 
-        <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4 min-h-0">
+        <div
+          ref={listRef}
+          onTouchMove={(e) => e.stopPropagation()}
+          className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 flex flex-col gap-6 min-h-0"
+        >
           {comments.length === 0 && (
             <p className="text-white/30 text-xs text-center mt-4">No comments yet. Be the first!</p>
           )}
           {comments.map((c) => (
-            <div key={c.id} className="flex flex-col gap-0.5">
+            <div key={c.id} className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
-                <span className="text-white text-xs font-semibold">{c.username || "Anonymous"}</span>
-                <span className="text-white/30 text-[10px]">{timeAgo(c.created_at)}</span>
+                <span className="text-white text-sm font-semibold">{c.username || "Anonymous"}</span>
+                <span className="text-white/40 text-xs">{timeAgo(c.created_at)}</span>
               </div>
-              <p className="text-white/80 text-xs leading-relaxed">{c.content}</p>
+              <p className="text-white/90 text-sm leading-relaxed">{c.content}</p>
             </div>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-[#222427] flex flex-col gap-2">
+        <form
+          onSubmit={handleSubmit}
+          onTouchMove={(e) => e.stopPropagation()}
+          className="px-5 pt-4 flex flex-col gap-2 border-t border-white/10"
+          style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+        >
           <input
             type="text"
-            placeholder="Username (optional)"
+            placeholder="Name (optional)"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="bg-[#1a1a1a] text-white text-xs placeholder-white/30 rounded-lg px-3 py-2 outline-none border border-[#333] focus:border-white/30"
+            className="bg-[#232326] text-white text-sm placeholder-white/30 rounded-full px-4 py-2 outline-none border border-transparent focus:border-white/20"
           />
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <input
               type="text"
               placeholder="Add a comment…"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="flex-1 bg-[#1a1a1a] text-white text-xs placeholder-white/30 rounded-lg px-3 py-2 outline-none border border-[#333] focus:border-white/30"
+              className="flex-1 bg-[#232326] text-white text-sm placeholder-white/30 rounded-full px-4 py-3 outline-none border border-transparent focus:border-white/20"
             />
             <button
               type="submit"
               disabled={submitting || !content.trim()}
-              className="text-white text-xs px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-colors"
+              className="shrink-0 text-sky-400 text-sm font-semibold px-1 disabled:opacity-30 transition-opacity"
             >
               Post
             </button>
@@ -136,14 +174,16 @@ export function CommentSection({ reelId, open, onClose }: CommentSectionProps) {
 // ---------------------------------------------------------------------------
 
 interface CommentButtonProps {
+  reelId: string;
   count: number | null;
   onClick: () => void;
 }
 
-export function CommentButton({ count, onClick }: CommentButtonProps) {
+export function CommentButton({ reelId, count, onClick }: CommentButtonProps) {
   return (
     <button
       onClick={onClick}
+      data-comment-toggle={reelId}
       className="flex flex-col items-center gap-1 hover:scale-105"
       aria-label="Comments"
     >

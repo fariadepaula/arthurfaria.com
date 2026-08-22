@@ -50,8 +50,8 @@ export function ReelContact() {
       </div>
 
       {status === "success" ? (
-        <div className="flex flex-col items-center gap-3 text-center">
-          <span className="text-2xl">✓</span>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-[#262626] bg-white/2 px-8 py-8 text-center">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-500/15 text-lg text-sky-400">✓</span>
           <p className="text-sm font-semibold text-white/80">Message sent!</p>
           <p className="text-xs text-white/40">
             I&apos;ll get back to you soon.
@@ -75,7 +75,7 @@ export function ReelContact() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/40 focus:bg-white/10"
+            className="w-full rounded-2xl border border-[#262626] bg-white/2 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/25"
           />
           <input
             type="email"
@@ -83,7 +83,7 @@ export function ReelContact() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/40 focus:bg-white/10"
+            className="w-full rounded-2xl border border-[#262626] bg-white/2 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/25"
           />
           <textarea
             placeholder="Message"
@@ -91,7 +91,7 @@ export function ReelContact() {
             rows={4}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full resize-none border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/40 focus:bg-white/10"
+            className="w-full resize-none rounded-2xl border border-[#262626] bg-white/2 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-white/25"
           />
 
           {status === "error" && (
@@ -105,7 +105,7 @@ export function ReelContact() {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === "loading" ? "Sending..." : "Send message"}
           </button>

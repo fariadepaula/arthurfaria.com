@@ -108,6 +108,7 @@ export default function Home() {
       label: "Projects",
       content: (
         <ReelProjects
+          title="Projects"
           projects={[
             {
               name: "arthurfaria.com",
@@ -127,6 +128,17 @@ export default function Home() {
               language: "HTML",
               github: "https://github.com/fariadepaula/rently",
             },
+          ]}
+        />
+      ),
+    },
+    {
+      id: "projects-2",
+      label: "Projects",
+      content: (
+        <ReelProjects
+          title="More Projects"
+          projects={[
             {
               name: "ipfas",
               description: "IP Finder as well as Server Names.",
@@ -145,6 +157,17 @@ export default function Home() {
               language: "TypeScript",
               github: "https://github.com/fariadepaula/photon-energia",
             },
+          ]}
+        />
+      ),
+    },
+    {
+      id: "projects-3",
+      label: "Projects",
+      content: (
+        <ReelProjects
+          title="More Projects again"
+          projects={[
             {
               name: "ruby-oop",
               description: "Educational material on OOP in Ruby — classes, modules, namespaces, and mixins.",

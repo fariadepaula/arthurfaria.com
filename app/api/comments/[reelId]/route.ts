@@ -3,8 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 type Params = { params: Promise<{ reelId: string }> };
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
   const { reelId } = await params;
+
+  if (req.nextUrl.searchParams.get("count") === "1") {
+    const { count, error } = await supabase
+      .from("reel_comments")
+      .select("*", { count: "exact", head: true })
+      .eq("reel_id", reelId);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ count: count ?? 0 });
+  }
 
   const { data, error } = await supabase
     .from("reel_comments")
