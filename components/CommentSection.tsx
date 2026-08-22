@@ -33,9 +33,10 @@ interface CommentSectionProps {
   onClose: () => void;
   onPosted?: () => void;
   description?: React.ReactNode;
+  showDescription?: boolean;
 }
 
-export function CommentSection({ reelId, open, onClose, onPosted, description }: CommentSectionProps) {
+export function CommentSection({ reelId, open, onClose, onPosted, description, showDescription = false }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [username, setUsername] = useState("");
   const [content, setContent] = useState("");
@@ -171,7 +172,7 @@ export function CommentSection({ reelId, open, onClose, onPosted, description }:
           onTouchMove={(e) => e.stopPropagation()}
           className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 flex flex-col gap-6 min-h-0"
         >
-          {description && (
+          {showDescription && description && (
             <div className="pb-6 border-b border-white/10">{description}</div>
           )}
           {comments.length === 0 && (

@@ -49,8 +49,9 @@ export function ReelExperience({ role, company, period, highlights, stack, video
   const highlight = highlights[0];
 
   // Register this reel's full description with the shared comments sheet —
-  // on real Instagram the caption and comments live in the same sheet, tap
-  // the caption to jump straight into it.
+  // on real Instagram the caption and comments live in the same sheet. Tap
+  // the caption to see the description (plus comments below it); tap the
+  // comment icon to see just the comments.
   useEffect(() => {
     setDescription(
       <div>

@@ -23,6 +23,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
   ref
 ) {
   const [commentOpen, setCommentOpen] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
   const [postDescription, setPostDescription] = useState<React.ReactNode | null>(null);
   const [commentCount, setCommentCount] = useState<number | null>(null);
   const fetchedCount = useRef(false);
@@ -67,11 +68,29 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
       .then((d) => setCommentCount(d.count ?? 0));
   }, [reelId, isActive, shouldPreload]);
 
-  const openComments = useCallback(() => setCommentOpen(true), []);
+  // Two entry points into the same sheet: tapping the caption shows the full
+  // description with comments right below it; the comment icon shows only
+  // the comments, no description, since the focus there is the comments.
+  const openDescription = useCallback(() => {
+    setCommentOpen(true);
+    setShowDescription(true);
+  }, []);
   const commentsContextValue = useMemo(
-    () => ({ openComments, setDescription: setPostDescription }),
-    [openComments]
+    () => ({ openComments: openDescription, setDescription: setPostDescription }),
+    [openDescription]
   );
+
+  function handleCommentIconClick() {
+    if (commentOpen && !showDescription) {
+      // Already open in comments-only mode — this click means "close".
+      setCommentOpen(false);
+    } else {
+      // Closed, or open showing the description (e.g. opened via the
+      // caption) — switch to comments-only rather than closing the sheet.
+      setCommentOpen(true);
+      setShowDescription(false);
+    }
+  }
 
   return (
     <ReelActiveContext.Provider value={{ isActive, shouldPreload }}>
@@ -101,7 +120,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
             <CommentButton
               reelId={reelId}
               count={commentCount}
-              onClick={() => setCommentOpen((o) => !o)}
+              onClick={handleCommentIconClick}
             />
           </div>
         </div>
@@ -110,7 +129,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
           <CommentButton
             reelId={reelId}
             count={commentCount}
-            onClick={() => setCommentOpen((o) => !o)}
+            onClick={handleCommentIconClick}
           />
         </div>
         <CommentSection
@@ -119,6 +138,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
           onClose={() => setCommentOpen(false)}
           onPosted={() => setCommentCount((c) => (c ?? 0) + 1)}
           description={postDescription}
+          showDescription={showDescription}
         />
       </div>
     </ReelActiveContext.Provider>
