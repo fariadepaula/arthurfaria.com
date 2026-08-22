@@ -73,11 +73,13 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
             {children}
           </div>
           {heartBurst && (
-            <img
-              src="/Unlike.svg"
-              alt=""
-              className="pointer-events-none absolute top-1/2 left-1/2 h-24 w-24 animate-[heart-burst_0.8s_ease-out_forwards] drop-shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-            />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <img
+                src="/Unlike.svg"
+                alt=""
+                className="h-24 w-24 animate-[heart-burst_0.8s_ease-out_forwards] drop-shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+              />
+            </div>
           )}
           {description && (
             <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-linear-to-t from-black/80 to-transparent">
