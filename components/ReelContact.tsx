@@ -1,21 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useReelsOptional } from "./ReelsContext";
-
-interface ReelContactProps {
-  reelId?: string;
-}
 
 type Status = "idle" | "loading" | "success" | "error";
 
 const CONTACT_FALLBACK = { link: "https://linkedin.com/in/arfaria", label: "LinkedIn" };
 
-export function ReelContact({ reelId }: ReelContactProps) {
-  const reels = useReelsOptional();
-  const isActive =
-    reels == null || reelId == null ? true : reels.activeReelId === reelId;
-
+export function ReelContact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");

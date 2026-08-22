@@ -19,10 +19,8 @@ const BRAINROT_VIDEOS_ORIGINAL = [
   "https://res.cloudinary.com/dad5eakr9/video/upload/v1772802417/cat_mzsna5.mp4",
 ];
 
-const BRAINROT_VIDEOS = BRAINROT_VIDEOS_ORIGINAL.map(url => `${url}?t=${Date.now()}`);
-
 function randomBrainrotVideos(count: number): string[] {
-  const shuffled = [...BRAINROT_VIDEOS].sort(() => Math.random() - 0.5);
+  const shuffled = [...BRAINROT_VIDEOS_ORIGINAL].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
 
@@ -33,14 +31,13 @@ export default function Home() {
     {
       id: "welcome",
       label: "Welcome",
-      content: <ReelWelcome reelId="welcome" video={<ReelVideo src="https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4" />} />,
+      content: <ReelWelcome video={<ReelVideo src="https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4" />} />,
     },
     {
       id: "experience-fit",
       label: "FIT Energia",
       content: (
         <ReelExperience
-          reelId="experience-fit"
           role="Product Engineer"
           company="FIT Energia (Santander Group)"
           period="Mar 2025 – Present"
@@ -67,7 +64,6 @@ export default function Home() {
       label: "Freelancing",
       content: (
         <ReelExperience
-          reelId="experience-freelance"
           role="Fullstack Software Engineer"
           company="Freelancing"
           period="Jul 2024 – Mar 2025"
@@ -91,7 +87,6 @@ export default function Home() {
       label: "Pingback",
       content: (
         <ReelExperience
-          reelId="experience-pingback"
           role="Software Engineer"
           company="Pingback"
           period="Oct 2023 – Jul 2024"
@@ -177,7 +172,7 @@ export default function Home() {
     {
       id: "contact",
       label: "Contact",
-      content: <ReelContact reelId="contact" />,
+      content: <ReelContact />,
     },
   ];
 

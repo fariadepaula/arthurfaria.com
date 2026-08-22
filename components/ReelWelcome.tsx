@@ -26,7 +26,6 @@ const NAV_HIGHLIGHTS = [
 const IG_GRADIENT = "linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7)";
 
 interface ReelWelcomeProps {
-  reelId?: string;
   video?: React.ReactNode;
 }
 

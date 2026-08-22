@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReelActive, useReelShouldPreload } from "./ReelActiveContext";
-import { useReels } from "./ReelsContext";
+import { useReelsOptional } from "./ReelsContext";
 
 interface ReelVideoProps {
   src: string;
@@ -13,7 +13,9 @@ export function ReelVideo({ src, className = "" }: ReelVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isActive = useReelActive();
   const shouldPreload = useReelShouldPreload();
-  const { muted, setMuted } = useReels();
+  const reels = useReelsOptional();
+  const muted = reels?.muted ?? true;
+  const setMuted = reels?.setMuted ?? (() => {});
 
   useEffect(() => {
     const video = videoRef.current;

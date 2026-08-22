@@ -7,7 +7,6 @@ interface Tag {
 }
 
 export interface ReelExperienceProps {
-  reelId?: string;
   role: string;
   company: string;
   period: string;
