@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar, MobileNav } from "@/components/Sidebar";
 import { ReelsFeed, ReelData } from "@/components/ReelsFeed";
 import { ReelWelcome } from "@/components/ReelWelcome";
 import { ReelExperience } from "@/components/ReelExperience";
@@ -193,6 +193,6 @@ export default function Home() {
   ];
 
   return (
-    <ReelsFeed reels={reels} sidebar={<Sidebar key="sidebar" />} />
+    <ReelsFeed reels={reels} sidebar={<Sidebar key="sidebar" />} mobileNav={<MobileNav key="mobile-nav" />} />
   );
 }

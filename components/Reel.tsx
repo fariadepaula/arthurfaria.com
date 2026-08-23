@@ -130,7 +130,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
 
   return (
     <ReelActiveContext.Provider value={{ isActive, shouldPreload }}>
-      <div ref={ref} className="h-[calc(100dvh-var(--mobile-nav-height)-env(safe-area-inset-bottom))] md:h-dvh flex justify-center snap-start">
+      <div ref={ref} className="h-full md:h-dvh flex justify-center snap-start">
         <div className="relative w-full md:w-auto md:aspect-[9/16] md:my-4 h-full md:h-[calc(100%-2rem)] overflow-hidden md:border border-[#222427] md:rounded-2xl bg-black shadow-[0_4px_50px_20px_rgba(0,0,80,0.1)]">
           <div className="h-full w-full" onClick={handleContentClick}>
             <ReelCommentsContext.Provider value={commentsContextValue}>

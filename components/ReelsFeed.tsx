@@ -14,9 +14,10 @@ export interface ReelData {
 interface ReelsFeedProps {
   reels: ReelData[];
   sidebar?: React.ReactNode;
+  mobileNav?: React.ReactNode;
 }
 
-export function ReelsFeed({ reels, sidebar }: ReelsFeedProps) {
+export function ReelsFeed({ reels, sidebar, mobileNav }: ReelsFeedProps) {
   const reelRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const [activeReelId, setActiveReelId] = useState<string | null>(
     reels[0]?.id ?? null
@@ -67,12 +68,15 @@ export function ReelsFeed({ reels, sidebar }: ReelsFeedProps) {
   return (
     <ReelsContext.Provider value={{ activeReelId, scrollToReel, muted, setMuted }}>
       {sidebar}
-      <div className="h-dvh overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
-        {reels.map((reel) => (
-          <Reel key={reel.id} ref={setRef(reel.id)} reelId={reel.id} description={reel.description} isActive={reel.id === activeReelId} shouldPreload={preloadReelIds.has(reel.id)}>
-            {reel.content}
-          </Reel>
-        ))}
+      <div className="h-dvh flex flex-col md:block">
+        <div className="flex-1 min-h-0 md:h-dvh overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
+          {reels.map((reel) => (
+            <Reel key={reel.id} ref={setRef(reel.id)} reelId={reel.id} description={reel.description} isActive={reel.id === activeReelId} shouldPreload={preloadReelIds.has(reel.id)}>
+              {reel.content}
+            </Reel>
+          ))}
+        </div>
+        {mobileNav}
       </div>
     </ReelsContext.Provider>
   );

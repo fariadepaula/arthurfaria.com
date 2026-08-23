@@ -46,54 +46,62 @@ export function Sidebar() {
   );
 
   return (
-    <>
-      <aside className={`fixed left-0 top-0 h-screen border-white/10 hidden md:flex flex-col items-center justify-center gap-1 z-40 px-4 py-2 ${hoveredSidebar ? "w-48" : "w-20"} transition-width duration-300`} onMouseEnter={() => setHoveredSidebar(true)}
-      onMouseLeave={() => setHoveredSidebar(false)}>
+    <aside className={`fixed left-0 top-0 h-screen border-white/10 hidden md:flex flex-col items-center justify-center gap-1 z-40 px-4 py-2 ${hoveredSidebar ? "w-48" : "w-20"} transition-width duration-300`} onMouseEnter={() => setHoveredSidebar(true)}
+    onMouseLeave={() => setHoveredSidebar(false)}>
 
-        {navItems.map((item) =>
-          item.reelId ? (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => reels?.scrollToReel(item.reelId!)}
-              className="w-full"
-            >
-              {itemContent(item)}
-            </button>
-          ) : (
-            <Link
-              key={item.label}
-              href={item.href!}
-              target="_blank"
-              className="w-full"
-            >
-              {itemContent(item)}
-            </Link>
-          )
-        )}
-      </aside>
+      {navItems.map((item) =>
+        item.reelId ? (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => reels?.scrollToReel(item.reelId!)}
+            className="w-full"
+          >
+            {itemContent(item)}
+          </button>
+        ) : (
+          <Link
+            key={item.label}
+            href={item.href!}
+            target="_blank"
+            className="w-full"
+          >
+            {itemContent(item)}
+          </Link>
+        )
+      )}
+    </aside>
+  );
+}
 
-      <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-center justify-around border-t border-white/10 bg-[#0C1014]"
-        style={{ height: "var(--mobile-nav-height)", paddingBottom: "env(safe-area-inset-bottom)" }}
-      >
-        {navItems.map((item) =>
-          item.reelId ? (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => reels?.scrollToReel(item.reelId!)}
-              aria-label={item.label}
-            >
-              <Image src={item.icon} alt={item.label} width={26} height={26} className="w-6.5 h-6.5" />
-            </button>
-          ) : (
-            <Link key={item.label} href={item.href!} target="_blank" aria-label={item.label}>
-              <Image src={item.icon} alt={item.label} width={26} height={26} className="w-6.5 h-6.5" />
-            </Link>
-          )
-        )}
-      </nav>
-    </>
+// ---------------------------------------------------------------------------
+// MobileNav — bottom tab bar, mobile only. A flex sibling of the reels
+// scroll container (see ReelsFeed) rather than a fixed overlay, so its
+// height is reserved by the browser's own flex layout instead of a
+// hand-calculated dvh/calc/env subtraction.
+// ---------------------------------------------------------------------------
+
+export function MobileNav() {
+  const reels = useReelsOptional();
+
+  return (
+    <nav className="md:hidden flex h-16 shrink-0 items-center justify-around border-t border-white/10 bg-[#0C1014] pb-[env(safe-area-inset-bottom)]">
+      {navItems.map((item) =>
+        item.reelId ? (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => reels?.scrollToReel(item.reelId!)}
+            aria-label={item.label}
+          >
+            <Image src={item.icon} alt={item.label} width={26} height={26} className="w-6.5 h-6.5" />
+          </button>
+        ) : (
+          <Link key={item.label} href={item.href!} target="_blank" aria-label={item.label}>
+            <Image src={item.icon} alt={item.label} width={26} height={26} className="w-6.5 h-6.5" />
+          </Link>
+        )
+      )}
+    </nav>
   );
 }
