@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Sidebar, MobileNav } from "@/components/Sidebar";
 import { ReelsFeed, ReelData } from "@/components/ReelsFeed";
-import { ReelWelcome } from "@/components/ReelWelcome";
+import { ReelWelcome, SubstackPost } from "@/components/ReelWelcome";
 import { ReelExperience } from "@/components/ReelExperience";
 import { ReelVideo } from "@/components/ReelVideo";
 import { ReelContact } from "@/components/ReelContact";
@@ -30,14 +30,47 @@ function randomBrainrotVideos(count: number): string[] {
   return shuffled.slice(0, count);
 }
 
-export default function Home() {
+// Named entities Substack titles actually use, plus numeric/hex escapes.
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'");
+}
+
+async function getSubstackPosts(count: number): Promise<SubstackPost[]> {
+  // Note: the page above is force-dynamic (for the random video pick), which
+  // forces every fetch on this route to no-store regardless of `next.revalidate`
+  // — so this genuinely re-fetches on every request. Keep it fast and safe
+  // with a hard timeout rather than pretending it's cached.
+  try {
+    const res = await fetch("https://afaaafa.substack.com/feed", { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error(`Substack feed responded ${res.status}`);
+    const xml = await res.text();
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, count);
+    return items.map(([, block]) => ({
+      title: decodeHtmlEntities(block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ?? "Untitled"),
+      link: block.match(/<link>(.*?)<\/link>/)?.[1] ?? "https://afaaafa.substack.com/",
+      image: block.match(/<enclosure[^>]*url="([^"]+)"/)?.[1] ?? null,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
   const [fitVideo, freelanceVideo, pingbackVideo] = randomBrainrotVideos(3);
+  const substackPosts = await getSubstackPosts(3);
 
   const reels: ReelData[] = [
     {
       id: "welcome",
       label: "Welcome",
-      content: <ReelWelcome video={<ReelVideo src={optimizeVideo("https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4")} />} />,
+      content: <ReelWelcome posts={substackPosts} video={<ReelVideo src={optimizeVideo("https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4")} />} />,
     },
     {
       id: "experience-fit",
