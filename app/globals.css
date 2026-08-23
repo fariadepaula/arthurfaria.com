@@ -30,3 +30,12 @@ body {
   70% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* Welcome reel: on a short card (landscape, or a short phone) the full 6-post
+   grid plus everything above it can outgrow the card, which is clipped and
+   non-scrolling. Drop to a single row so the nav highlights stay reachable. */
+@container (max-height: 650px) {
+  .welcome-post-grid > a:nth-child(n + 4) {
+    display: none;
+  }
+}

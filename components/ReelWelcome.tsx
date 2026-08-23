@@ -24,9 +24,14 @@ const SOCIAL_LINKS = [
   { label: "Substack", icon: "/Substack.svg", href: "https://afaaafa.substack.com/" },
 ];
 
+// Sized in cqw (relative to the card's own width) instead of px, so the
+// whole layout scales together on any card size — mobile full-bleed or
+// the fixed 9:16 desktop card — instead of looking tiny on a big screen.
+const ICON_CLASS = "h-[5.6cqw] w-[5.6cqw]";
+
 function ExperienceIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="white" className="h-5.5 w-5.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="white" className={ICON_CLASS} aria-hidden="true">
       <path d="M9 4a2 2 0 0 0-2 2v1H4.5A2.5 2.5 0 0 0 2 9.5v8A2.5 2.5 0 0 0 4.5 20h15a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 19.5 7H17V6a2 2 0 0 0-2-2H9Zm0 2h6v1H9V6ZM4.5 9h15a.5.5 0 0 1 .5.5V12h-6v-.5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.5H4V9.5a.5.5 0 0 1 .5-.5ZM4 14h6v.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V14h6v3.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5V14Z" />
     </svg>
   );
@@ -34,7 +39,7 @@ function ExperienceIcon() {
 
 function ProjectsIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="white" className="h-5.5 w-5.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="white" className={ICON_CLASS} aria-hidden="true">
       <path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h3.879a2.5 2.5 0 0 1 1.767.732L12.56 6.146A1.5 1.5 0 0 0 13.62 6.6H18.5A2.5 2.5 0 0 1 21 9.1v8.4A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-11Z" />
     </svg>
   );
@@ -42,7 +47,7 @@ function ProjectsIcon() {
 
 function EducationIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="white" className="h-5.5 w-5.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="white" className={ICON_CLASS} aria-hidden="true">
       <path d="M12 3.2 1.6 8.3 12 13.4l8.4-4.1v6.3h1.7V8.3L12 3.2Z" />
       <path d="M5.6 10.8v3.3c0 2.4 2.9 4.4 6.4 4.4s6.4-2 6.4-4.4v-3.3L12 13.9l-6.4-3.1Z" />
     </svg>
@@ -51,7 +56,7 @@ function EducationIcon() {
 
 function ContactIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="white" className="h-5.5 w-5.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="white" className={ICON_CLASS} aria-hidden="true">
       <path d="M3.2 20.4 21 12 3.2 3.6l.02 6.4L15 12 3.22 14 3.2 20.4Z" />
     </svg>
   );
@@ -75,101 +80,99 @@ function VerifiedBadge() {
 }
 
 interface ReelWelcomeProps {
-  video?: React.ReactNode;
   posts: SubstackPost[];
 }
 
-export function ReelWelcome({ video, posts }: ReelWelcomeProps) {
+export function ReelWelcome({ posts }: ReelWelcomeProps) {
   const reels = useReelsOptional();
 
   return (
-    <div className="relative h-full">
-      {video && (
-        <>
-          <div className="absolute inset-0">{video}</div>
-          <div className="absolute inset-0 bg-black/80 pointer-events-none" />
-        </>
-      )}
+    <div className="relative h-full [container-type:size]">
+      <div className="relative z-10 flex h-full min-h-0 flex-col gap-[4cqw] px-[5cqw] pt-[8cqw] pb-[5cqw] text-white pointer-events-none">
 
-      <div className="relative z-10 flex h-full flex-col gap-5 px-6 py-12 text-white pointer-events-none">
-
-        <div className="flex items-center gap-4 pointer-events-auto">
-          <div className="shrink-0 rounded-full p-0.75" style={{ background: IG_GRADIENT }}>
-            <div className="rounded-full bg-black p-0.75">
-              <Image
-                src="/Profile.jpg"
-                alt="Arthur Faria"
-                width={64}
-                height={64}
-                className="rounded-full object-cover"
-              />
+        <div className="flex items-center gap-[4cqw] pointer-events-auto">
+          <div className="shrink-0 rounded-full p-[0.8cqw]" style={{ background: IG_GRADIENT }}>
+            <div className="rounded-full bg-black p-[0.8cqw]">
+              <Link href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">
+                <Image
+                  src="/Profile.jpg"
+                  alt="Arthur Faria"
+                  width={168}
+                  height={168}
+                  className="h-[22cqw] w-[22cqw] rounded-full object-cover"
+                />
+              </Link>
             </div>
           </div>
-          <div className="flex flex-1 justify-around">
-            {STATS.map(({ value, label }) => (
-              <div key={label} className="flex flex-col items-center gap-0.5">
-                <span className="text-base font-black">{value}</span>
-                <span className="text-[10.5px] text-white/50">{label}</span>
-              </div>
-            ))}
+          <div className="flex flex-1 flex-col gap-[2.5cqw]">
+            {/* <div className="flex items-center gap-1.5 text-sm font-bold">
+              arthurfaria
+              <VerifiedBadge />
+            </div> */}
+            <h1 className="text-[3.8cqw] font-bold tracking-tight">Arthur Faria</h1>
+            <div className="flex gap-[6cqw]">
+              {STATS.map(({ value, label }) => (
+                <div key={label} className="flex flex-col gap-[0.5cqw]">
+                  <span className="text-[4.6cqw] font-black">{value}</span>
+                  <span className="text-[3cqw] text-white/50">{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         <div>
-          {/* <div className="flex items-center gap-1.5 text-sm font-bold">
-            arthurfaria
-            <VerifiedBadge />
-          </div> */}
-          <h1 className="mt-1 text-lg font-black tracking-tight">Arthur Faria</h1>
-          <p className="text-sm text-white/60">🥀 Cracked Software Engineer · 🇧🇷</p>
-          <p className="mt-2 max-w-70 text-sm leading-relaxed text-white/70">
+          <p className="text-[3.6cqw] text-white/60">🥀 Cracked Software Engineer · 🇧🇷</p>
+          <p className="mt-[2cqw] max-w-[72cqw] text-[3.6cqw] leading-relaxed text-white/70">
             I&apos;m a Product Engineer (or at least this what I say to my mom and co-workers).
           </p>
+        </div>
+
+        <div className="flex items-center gap-[4cqw] pointer-events-auto">
           <Link
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto mt-3 inline-block rounded-lg bg-[#262629] px-6 py-1.5 text-xs font-semibold transition hover:bg-[#2f2f33]"
+            className="rounded-[2cqw] bg-[#262629] px-[6cqw] py-[1.5cqw] text-[3cqw] font-semibold transition hover:bg-[#2f2f33]"
           >
             Following
           </Link>
+          <div className="ml-auto flex items-center gap-[4cqw]">
+            {SOCIAL_LINKS.map(({ label, icon, href }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="opacity-70 transition hover:opacity-100"
+              >
+                <Image src={icon} alt={label} width={40} height={40} className="h-[5cqw] w-[5cqw]" />
+              </a>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-5 pointer-events-auto">
-          {SOCIAL_LINKS.map(({ label, icon, href }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="opacity-60 transition hover:opacity-100"
-            >
-              <Image src={icon} alt={label} width={22} height={22} />
-            </a>
-          ))}
-        </div>
-
-        <div className="flex gap-5 pointer-events-auto">
+        <div className="flex gap-[5cqw] pointer-events-auto">
           {NAV_HIGHLIGHTS.map(({ id, label, Icon }) => (
             <button
               key={id}
               type="button"
               onClick={() => reels?.scrollToReel(id)}
-              className="flex cursor-pointer flex-col items-center gap-1.5 transition-transform active:scale-90"
+              className="flex cursor-pointer flex-col items-center gap-[1.5cqw] transition-transform active:scale-90"
             >
-              <div className="rounded-full p-[2.5px]" style={{ background: IG_GRADIENT }}>
-                <div className="flex h-13.5 w-13.5 items-center justify-center rounded-full bg-black transition hover:bg-neutral-900">
+              <div className="rounded-full p-[0.65cqw]" style={{ background: IG_GRADIENT }}>
+                <div className="flex h-[13.8cqw] w-[13.8cqw] items-center justify-center rounded-full bg-black transition hover:bg-neutral-900">
                   <Icon />
                 </div>
               </div>
-              <span className="text-[11px] font-medium text-white/70">{label}</span>
+              <span className="text-[2.8cqw] font-medium text-white/70">{label}</span>
             </button>
           ))}
         </div>
 
         {posts.length > 0 && (
-          <div className="pointer-events-auto mt-2 grid grid-cols-3 gap-0.5 border-t border-white/10 pt-3">
+          <div className="welcome-post-grid pointer-events-auto grid grid-cols-3 gap-[0.5cqw] border-t border-white/10 pt-[3cqw]">
             {posts.map((post, i) => (
               <a
                 key={`${post.link}-${i}`}
@@ -185,7 +188,7 @@ export function ReelWelcome({ video, posts }: ReelWelcomeProps) {
                     className="h-full w-full object-cover transition group-hover:opacity-80"
                   />
                 ) : (
-                  <span className="flex h-full items-center justify-center p-2 text-center text-[10px] leading-tight text-white/60">
+                  <span className="flex h-full items-center justify-center p-[2cqw] text-center text-[2.6cqw] leading-tight text-white/60">
                     {post.title}
                   </span>
                 )}

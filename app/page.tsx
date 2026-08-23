@@ -64,13 +64,13 @@ async function getSubstackPosts(count: number): Promise<SubstackPost[]> {
 
 export default async function Home() {
   const [fitVideo, freelanceVideo, pingbackVideo] = randomBrainrotVideos(3);
-  const substackPosts = await getSubstackPosts(3);
+  const substackPosts = await getSubstackPosts(6);
 
   const reels: ReelData[] = [
     {
       id: "welcome",
       label: "Welcome",
-      content: <ReelWelcome posts={substackPosts} video={<ReelVideo src={optimizeVideo("https://res.cloudinary.com/dad5eakr9/video/upload/v1773440895/life_could_be_a_dream_nliziq.mp4")} />} />,
+      content: <ReelWelcome posts={substackPosts} />,
     },
     {
       id: "experience-fit",
