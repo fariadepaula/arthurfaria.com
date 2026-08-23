@@ -75,7 +75,11 @@ export function ReelExperience({ role, company, period, highlights, stack, video
     <div className="relative h-full text-white">
       {video && <div className="absolute inset-0">{video}</div>}
 
-      {/* Caption overlay — tap to open the full description in the comments sheet */}
+      {/* Gradient scrim — purely decorative, sized for the fade effect; not clickable itself */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 pt-24 pb-8 pl-4 pr-20 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
+
+      {/* Caption — tap to open the full description in the comments sheet. Only
+          the actual text hugs the click target, not the gradient above it. */}
       <div
         role="button"
         tabIndex={0}
@@ -86,7 +90,7 @@ export function ReelExperience({ role, company, period, highlights, stack, video
             openComments();
           }
         }}
-        className="absolute inset-x-0 bottom-0 cursor-pointer pt-24 pb-8 pl-4 pr-20 text-left bg-linear-to-t from-black/90 via-black/50 to-transparent"
+        className="absolute inset-x-0 bottom-0 cursor-pointer pb-8 pl-4 pr-20 text-left"
       >
         <p className="text-xs font-bold uppercase tracking-widest text-white/40">Experience</p>
         <h2 className="mt-2 text-xl font-black tracking-tight">{company}</h2>
