@@ -57,7 +57,7 @@ export default function Home() {
             "Led technical talks on OOD, Sidekiq Enterprise, and Clean Code",
           ]}
           stack={["Ruby on Rails", "Hotwire", "Erb", "Sidekiq"]}
-          video={<ReelVideo src={fitVideo} eagerPreload showMuteButton={false} />}
+          video={<ReelVideo src={fitVideo} eagerPreload />}
         />
       ),
     },
@@ -75,7 +75,7 @@ export default function Home() {
             "Implemented automated property sync via third-party APIs, reducing manual overhead",
           ]}
           stack={["MongoDB", "Next.js", "JavaScript", "TypeScript"]}
-          video={<ReelVideo src={freelanceVideo} eagerPreload showMuteButton={false} />}
+          video={<ReelVideo src={freelanceVideo} eagerPreload />}
         />
       ),
     },
@@ -92,7 +92,7 @@ export default function Home() {
             "Developed a lead-generation page with gated content delivery to drive newsletter subscription growth",
           ]}
           stack={["Node.js", "AWS"]}
-          video={<ReelVideo src={pingbackVideo} eagerPreload showMuteButton={false} />}
+          video={<ReelVideo src={pingbackVideo} eagerPreload />}
         />
       ),
     },

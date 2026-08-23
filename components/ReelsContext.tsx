@@ -6,7 +6,7 @@ export interface ReelsContextValue {
   activeReelId: string | null;
   scrollToReel: (id: string) => void;
   muted: boolean;
-  setMuted: (muted: boolean) => void;
+  setMuted: (muted: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 export const ReelsContext = createContext<ReelsContextValue | null>(null);

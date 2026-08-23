@@ -129,7 +129,7 @@ export function CommentSection({ reelId, open, onClose, onPosted, description, s
 
   return (
     <div
-      className={`fixed inset-0 z-20 flex flex-col justify-end md:relative md:inset-auto md:my-4 md:ml-4 md:h-[calc(100%-2rem)] md:justify-stretch transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-50 flex flex-col justify-end md:relative md:inset-auto md:my-4 md:ml-4 md:h-[calc(100%-2rem)] md:justify-stretch transition-opacity duration-200 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
     >
       {/* backdrop — mobile sheet only, desktop panel sits inline */}
       <div
