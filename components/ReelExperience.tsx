@@ -76,7 +76,7 @@ export function ReelExperience({ role, company, period, highlights, stack, video
       {video && <div className="absolute inset-0">{video}</div>}
 
       {/* Gradient scrim — purely decorative, sized for the fade effect; not clickable itself */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 pt-48 pb-8 pl-4 pr-20 bg-[linear-gradient(to_top,black_0%,black_25%,rgba(0,0,0,0.85)_45%,rgba(0,0,0,0.55)_65%,rgba(0,0,0,0.2)_85%,transparent_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 pt-24 pb-8 pl-4 pr-20 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
 
       {/* Caption — tap to open the full description in the comments sheet. Only
           the actual text hugs the click target, not the gradient above it. */}
