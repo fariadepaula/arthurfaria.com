@@ -42,12 +42,14 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
   const [commentOpen, setCommentOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [postDescription, setPostDescription] = useState<React.ReactNode | null>(null);
-  const [commentCount, setCommentCount] = useState<number | null>(null);
-  const fetchedCount = useRef(false);
-  const { liked, count: likeCount, toggle: toggleLike, like } = useLike(reelId);
   const reelsCtx = useReelsOptional();
   const muted = reelsCtx?.muted ?? true;
   const setMuted = reelsCtx?.setMuted ?? (() => {});
+  const likeCount = reelsCtx?.likeCounts[reelId] ?? null;
+  const commentCount = reelsCtx?.commentCounts[reelId] ?? null;
+  const { liked, toggle: toggleLike, like } = useLike(reelId, (delta) =>
+    reelsCtx?.bumpLikeCount(reelId, delta)
+  );
   const lastTapRef = useRef(0);
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [heartBurst, triggerHeartBurst] = useFlash(800);
@@ -96,20 +98,28 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
     if (!isActive) setCommentOpen(false);
   }
 
-  useEffect(() => {
-    if (fetchedCount.current || (!isActive && !shouldPreload)) return;
-    fetchedCount.current = true;
-    fetch(`/api/comments/${reelId}?count=1`)
-      .then((r) => r.json())
-      .then((d) => setCommentCount(d.count ?? 0));
-  }, [reelId, isActive, shouldPreload]);
-
   // Two entry points into the same sheet: tapping the caption shows the full
-  // description with comments right below it; the comment icon shows only
-  // the comments, no description, since the focus there is the comments.
+  // description with comments right below it (tapping it again closes it —
+  // a toggle, like the comment icon below); the comment icon shows only the
+  // comments, no description, since the focus there is the comments.
+  //
+  // Read via refs (not the state closure) so this stays a stable callback —
+  // required for commentsContextValue's memoization below — while still
+  // toggling off the latest state instead of a stale snapshot.
+  const commentOpenRef = useRef(commentOpen);
+  const showDescriptionRef = useRef(showDescription);
+  useEffect(() => {
+    commentOpenRef.current = commentOpen;
+    showDescriptionRef.current = showDescription;
+  });
+
   const openDescription = useCallback(() => {
-    setCommentOpen(true);
-    setShowDescription(true);
+    if (commentOpenRef.current && showDescriptionRef.current) {
+      setCommentOpen(false);
+    } else {
+      setCommentOpen(true);
+      setShowDescription(true);
+    }
   }, []);
   const commentsContextValue = useMemo(
     () => ({ openComments: openDescription, setDescription: setPostDescription }),
@@ -189,7 +199,7 @@ export const Reel = forwardRef<HTMLDivElement, ReelProps>(function Reel(
           reelId={reelId}
           open={commentOpen}
           onClose={() => setCommentOpen(false)}
-          onPosted={() => setCommentCount((c) => (c ?? 0) + 1)}
+          onPosted={() => reelsCtx?.bumpCommentCount(reelId, 1)}
           description={postDescription}
           showDescription={showDescription}
         />
